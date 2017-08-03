@@ -10,10 +10,9 @@ class EventsList extends Component {
   render() {
     const {events} = this.props;
     const filterEvents =  events.reduce((result, item) => {
-      if (!result.includes(item.name)) {
+      if((result.filter(element  => element.name === item.name)).length !== 1) {
         result.push(item);
       }
-
       return result;
     }, []);
 
