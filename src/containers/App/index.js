@@ -4,18 +4,16 @@ import {Route} from 'react-router-dom';
 import Events from '../../components/Events';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import Search from '../../components/Search';
 
 class App extends Component {
   render () {
-    const {events} = this.props;
-
+    //const {events} = this.props;
+    console.log('this.props: ', this.props);
     return (
-      <div>
+      <div id='main-container'>
         <Header />
-        <Search />
         <Route component={Events} />
-        <Footer />
+        {/*<Footer />*/}
       </div>
     );
   }

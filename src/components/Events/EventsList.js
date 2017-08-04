@@ -10,14 +10,14 @@ class EventsList extends Component {
   render() {
     const {events} = this.props;
     const filterEvents =  events.reduce((result, item) => {
-      if((result.filter(element  => element.name === item.name)).length !== 1) {
+      if((result.filter(element  => element.name === item.name)).length === 0) {
         result.push(item);
       }
       return result;
     }, []);
 
     return (
-      <div>
+      <div className='container'>
         <ul className="c-list">
            {filterEvents.map(item => {
                return (
