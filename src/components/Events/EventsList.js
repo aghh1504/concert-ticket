@@ -1,25 +1,52 @@
 import React, { Component } from 'react';
 import {Route} from 'react-router-dom';
 import {Link} from 'react-router-dom';
-import { connect } from "react-redux";
+import {array, bool, func} from 'prop-types';
+import { connect } from "react-redux"
+import * as actions from "../../action";
+import {countryCodes, conutryNameToCode} from '../../helper/countrycodemapping.js';
 //import styles from './styles.scss';
 import '../../App.css';
 
+const getUniqueEvents = (events = []) => {
+  const eventsMap = {};
+
+  return events.reduce((result, item) => {
+    const eventName = item.name;
+
+    if(!eventsMap[eventName]) {
+      eventsMap[eventName] = true;
+      result.push(item);
+    }
+
+    return result;
+  }, []);
+};
+
 class EventsList extends Component {
 
-  render() {
-    const {events} = this.props;
-    const filterEvents =  events.reduce((result, item) => {
-      if((result.filter(element  => element.name === item.name)).length !== 1) {
-        result.push(item);
-      }
-      return result;
-    }, []);
+  getCountryCode () {
+    return conutryNameToCode[this.props.match.params.countryName];
+  }
 
+  componentDidMount() {
+    this.props.fetchListOfEvent(this.getCountryCode());
+  }
+
+  render() {
+    const {events, inProgress} = this.props;
+    const countryCode = this.getCountryCode();
+    const countryName = countryCodes[countryCode];
+
+    if (inProgress) {
+        return <div>Loading...</div>
+    }
+    // const {countryName} = match.params;
     return (
       <div>
-        <ul className="c-list">
-           {filterEvents.map(item => {
+        <h1>Events {countryName ? `in ${countryName}` : 'everywhere'}</h1>
+        {!events.length ? 'No events found' : <ul className="c-list">
+           {events.map(item => {
                return (
                    <li className="c-list__item" key={item.id}>
                            <div className="c-list__block">
@@ -42,14 +69,21 @@ class EventsList extends Component {
                    </li>
                )
            })}
-        </ul>
+        </ul>}
       </div>
     );
   }
 }
 
+EventsList.propTypes = {
+  events: array,
+  inProgress: bool,
+  fetchListOfEvent: func.isRequired
+};
+
 const mapStateToProps = (state) => ({
-  events: state.fetchListOfEvent.items
+  events: getUniqueEvents(state.fetchListOfEvent.items),
+  inProgress: state.fetchListOfEvent.inProgress
 });
 
-export default connect(mapStateToProps)(EventsList);
+export default connect(mapStateToProps, actions)(EventsList);

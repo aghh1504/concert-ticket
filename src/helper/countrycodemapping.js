@@ -251,4 +251,10 @@ const countryCodes = {
   "MZ": "Mozambique"
 }
 
-export default countryCodes;
+const conutryNameToCode = Object.keys(countryCodes).reduce((result, key) => {
+  result[countryCodes[key].toLowerCase()] = key;
+
+  return result;
+}, {});
+
+export {conutryNameToCode, countryCodes};

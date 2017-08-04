@@ -5,6 +5,7 @@ import Events from '../../components/Events';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import Search from '../../components/Search';
+import EventsList from '../../components/Events/EventsList';
 
 class App extends Component {
   render () {
@@ -13,7 +14,7 @@ class App extends Component {
     return (
       <div>
         <Header />
-        <Search />
+        <Route component={Search} />
         <Route component={Events} />
         <Footer />
       </div>

@@ -1,45 +1,82 @@
-import React, {Component} from 'react'
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import {object} from 'prop-types';
 import * as actions from "../../action";
-import {connect} from 'react-redux';
-import countryCodeHelper from '../../helper/countrycodemapping';
+import {countryCodes, conutryNameToCode} from "../../helper/countrycodemapping";
 
 class Search extends Component {
-
   state = {
-    inputValue: ''
+    inputValue: "",
+    errorMessage: "",
+    finalCountries: Object.values(countryCodes),
+    showList: false
   };
-  findCityTimeoutId = null;
 
-  convertFromCountryCodeToName = (name) => {
-           for(var key in countryCodeHelper){
-              if (countryCodeHelper[key].toLowerCase() === name.toLowerCase()) return key;
-      }
+  convertFromCountryCodeToName = name => {
+    return conutryNameToCode[name];
+  };
+
+  filterCountries = (search) => {
+    const regexp = new RegExp(search, 'i');
+
+    return Object.values(countryCodes)
+      .filter((countryName) => regexp.test(countryName));
   }
 
-  handleSubmitForm = (e) => {
-    e.preventDefault();
-  console.log('this.state: ', this.state);
-    const cityName = this.convertFromCountryCodeToName(this.state.inputValue);
+  handleSubmitForm = countryName => {
+    console.log('OK')
+    const searchName = countryName.toLowerCase();
+    const countryCode = conutryNameToCode[searchName];
 
-    this.props.fetchListOfEvent(cityName);
-  }
+     if (countryCode) {
+        const {history, fetchListOfEvent} = this.props;
+        const contryName = countryCodes[countryCode];
 
-  handleInputChange = (e) => {
-    this.setState({...this.state, inputValue: e.target.value});
-  }
+        fetchListOfEvent(countryCode);
+        this.setState({errorMessage: '', inputValue: countryName})
+        history.push({pathname: `/events/country/${contryName.toLowerCase()}`})
+    } else {
+        this.setState({errorMessage: 'Sorry, we dont have any events in that city'})
+    }
+  };
+
+  handleInputChange = e => {
+    const inputValue = e.target.value;
+
+    this.setState({ ...this.state,
+      inputValue,
+      finalCountries: this.filterCountries(inputValue)
+    });
+  };
 
   render() {
+    const {finalCountries, showList} = this.state;
+
     return (
+      <div>
       <form onSubmit={this.handleSubmitForm}>
-        <input value={this.state.inputValue} onChange={this.handleInputChange}/>
-        <button type='submit'>Search</button>
+        <input
+          value={this.state.inputValue}
+          onChange={this.handleInputChange}
+          onFocus={() => this.setState({...this.state, showList: true})}
+          onBlur={() => setTimeout(() => this.setState({...this.state, showList: false}), 100)}
+        />
+        <button type="submit">Search</button>
+        {showList && finalCountries.map((countryName) =>
+            <div key={countryName} onClick={() => this.handleSubmitForm(countryName)}>{countryName}</div>)}
       </form>
-    )
+     <p>{this.state.errorMessage}</p>
+    </div>
+    );
   }
 }
 
-const mapStateToProps = (state) => ({
+Search.propTypes = {
+  history: object.isRequired
+};
+
+const mapStateToProps = state => ({
   events: state.fetchListOfEvent.items
 });
 
-export default connect(mapStateToProps, actions)(Search)
+export default connect(mapStateToProps, actions)(Search);

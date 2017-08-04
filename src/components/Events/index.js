@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import {Route, withRouter} from 'react-router-dom';
-import * as actions from "../../action";
-import {Link} from 'react-router-dom';
-import { connect } from "react-redux";
+import {Route} from 'react-router-dom';
 //import styles from './styles.scss';
 import '../../App.css';
 import ViewEvent from './ViewEvent';
@@ -11,18 +8,15 @@ import EventsList from './EventsList';
 
 class Events extends Component {
 
-  componentDidMount() {
-    this.props.fetchListOfEvent()
-  }
-
   render() {
     return (
       <div>
         <Route exact={true} path='/' component={EventsList} />
-        <Route path='/events/:eventId' component={ViewEvent} />
+        <Route exact={true} path="/events/country/:countryName" component={EventsList} />
+        <Route exact={true} path='/events/:eventId' component={ViewEvent} />
       </div>
     );
   }
 }
 
-export default connect(null, actions)(Events);
+export default Events;
