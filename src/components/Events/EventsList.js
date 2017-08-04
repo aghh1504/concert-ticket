@@ -43,7 +43,7 @@ class EventsList extends Component {
     }
     // const {countryName} = match.params;
     return (
-      <div>
+      <div className='container'>
         <h1>Events {countryName ? `in ${countryName}` : 'everywhere'}</h1>
         {!events.length ? 'No events found' : <ul className="c-list">
            {events.map(item => {

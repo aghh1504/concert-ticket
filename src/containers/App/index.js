@@ -9,14 +9,12 @@ import EventsList from '../../components/Events/EventsList';
 
 class App extends Component {
   render () {
-    const {events} = this.props;
-
     return (
-      <div>
+      <div id='main-container'>
         <Header />
         <Route component={Search} />
         <Route component={Events} />
-        <Footer />
+        {/*<Footer />*/}
       </div>
     );
   }
