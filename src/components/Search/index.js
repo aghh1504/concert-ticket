@@ -5,12 +5,16 @@ import * as actions from "../../action";
 import {countryCodes, conutryNameToCode} from "../../helper/countrycodemapping";
 
 class Search extends Component {
-  state = {
-    inputValue: "",
-    errorMessage: "",
-    finalCountries: Object.values(countryCodes),
-    showList: false
-  };
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      inputValue: "",
+      errorMessage: "",
+      finalCountries: this.filterCountries(''),
+      showList: false
+    };
+  }
 
   convertFromCountryCodeToName = name => {
     return conutryNameToCode[name];
@@ -24,7 +28,6 @@ class Search extends Component {
   }
 
   handleSubmitForm = countryName => {
-    console.log('OK')
     const searchName = countryName.toLowerCase();
     const countryCode = conutryNameToCode[searchName];
 
@@ -33,7 +36,7 @@ class Search extends Component {
         const contryName = countryCodes[countryCode];
 
         fetchListOfEvent(countryCode);
-        this.setState({errorMessage: '', inputValue: countryName})
+        this.setState({errorMessage: '', inputValue: ''})
         history.push({pathname: `/events/country/${contryName.toLowerCase()}`})
     } else {
         this.setState({errorMessage: 'Sorry, we dont have any events in that city'})
@@ -59,7 +62,7 @@ class Search extends Component {
           value={this.state.inputValue}
           onChange={this.handleInputChange}
           onFocus={() => this.setState({...this.state, showList: true})}
-          onBlur={() => setTimeout(() => this.setState({...this.state, showList: false}), 100)}
+          onBlur={() => setTimeout(() => this.setState({...this.state, showList: false}), 200)}
         />
         <button type="submit">Search</button>
         {showList && finalCountries.map((countryName) =>
