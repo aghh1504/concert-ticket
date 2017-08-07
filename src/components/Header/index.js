@@ -58,17 +58,23 @@ class Search extends Component {
     return (
       <div className='container'>
       <form onSubmit={() => this.handleSubmitForm(this.state.inputValue)}>
-        <input
-          id='country-search'
-          value={this.state.inputValue}
-          placeholder='Enter country...'
-          onChange={this.handleInputChange}
-          onFocus={() => this.setState({...this.state, showList: true})}
-          onBlur={() => setTimeout(() => this.setState({...this.state, showList: false}), 200)}
-        />
-        <button id='search-button' type="submit">Search</button>
-        {showList && finalCountries.map((countryName) =>
-            <div key={countryName} onClick={() => this.handleSubmitForm(countryName)}>{countryName}</div>)}
+        <div className='input-dropdown'>
+          <input
+            id='country-search'
+            value={this.state.inputValue}
+            placeholder='Enter country...'
+            onChange={this.handleInputChange}
+            onFocus={() => this.setState({...this.state, showList: true})}
+            onBlur={() => setTimeout(() => this.setState({...this.state, showList: false}), 200)}
+          />
+          <button id='search-button' type="submit">Search</button>
+          <div className='dropdown'>
+            {
+              showList && finalCountries.map((countryName) =>
+                <div key={countryName} className='country-item' onClick={() => this.handleSubmitForm(countryName)}>{countryName}</div>)
+            }
+          </div>
+        </div>
       </form>
      <p>{this.state.errorMessage}</p>
     </div>

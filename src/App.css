@@ -35,7 +35,7 @@ p {
   color: white;
   font-size: 15px;
   font-family: Cambria, Cochin, Georgia, Times, Times New Roman, serif;
-  
+
 }
 #header-content{
   float: left;
@@ -66,7 +66,7 @@ p {
 
 .c-list {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   flex-wrap: wrap;
   padding-left: 0px;
 }
@@ -156,6 +156,15 @@ form{
   background: #fff;
   border: 1px solid black;
   box-shadow: 0px 0px 100px rgba(0,0,0,1);
+  }
 }
 
+.input-dropdown .country-item {
+    padding: 3px;
+    font-family: Helvetica;
+    border: 1px solid #c0c0c0;
+    background: #fff;
+    width: 30%;
+    display: flex;
+    justify-content: center;
 }
