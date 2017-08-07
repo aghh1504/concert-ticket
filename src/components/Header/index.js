@@ -1,62 +1,87 @@
-import React, {Component} from 'react'
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import {object} from 'prop-types';
 import * as actions from "../../action";
-import {connect} from 'react-redux';
-import countryCodeHelper from '../../helper/countrycodemapping';
+import {countryCodes, conutryNameToCode} from "../../helper/countrycodemapping";
 
-class Header extends Component {
-  state = {
-    inputValue: ''
+class Search extends Component {
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      inputValue: "",
+      errorMessage: "",
+      finalCountries: this.filterCountries(''),
+      showList: false
+    };
+  }
+
+  convertFromCountryCodeToName = name => {
+    return conutryNameToCode[name];
   };
-  findCityTimeoutId = null;
 
-  convertFromCountryCodeToName = (name) => {
-    for (var key in countryCodeHelper) {
-      if (countryCodeHelper[key].toLowerCase() === name.toLowerCase()) 
-        return key;
-      }
+  filterCountries = (search) => {
+    const regexp = new RegExp(search, 'i');
+
+    return Object.values(countryCodes)
+      .filter((countryName) => regexp.test(countryName));
+  }
+
+  handleSubmitForm = countryName => {
+    const searchName = countryName.toLowerCase();
+    const countryCode = conutryNameToCode[searchName];
+
+     if (countryCode) {
+        const {history, fetchListOfEvent} = this.props;
+        const contryName = countryCodes[countryCode];
+
+        fetchListOfEvent(countryCode);
+        this.setState({errorMessage: '', inputValue: ''})
+        history.push({pathname: `/events/country/${contryName.toLowerCase()}`})
+    } else {
+        this.setState({errorMessage: 'Sorry, we dont have any events in that country'})
     }
+  };
 
-  handleSubmitForm = (e) => {
-    e.preventDefault();
-    console.log('this.state: ', this.state);
-    const cityName = this.convertFromCountryCodeToName(this.state.inputValue);
+  handleInputChange = e => {
+    const inputValue = e.target.value;
 
-    this
-      .props
-      .fetchListOfEvent(cityName);
-  }
-
-  handleInputChange = (e) => {
-    this.setState({
-      ...this.state,
-      inputValue: e.target.value
+    this.setState({ ...this.state,
+      inputValue,
+      finalCountries: this.filterCountries(inputValue)
     });
-  }
+  };
 
   render() {
+    const {finalCountries, showList} = this.state;
+
     return (
-      <header>
-        <div className='container'>
-          {/*<section id='header-search'>*/}
-            <form onSubmit={this.handleSubmitForm}>
-              <input
-                id='country-search'
-                type='textbox'
-                placeholder='Enter country...'
-                value={this.state.inputValue}
-                onChange={this.handleInputChange}></input>
-              <button id='search-button' type='Sumbit'>
-                Search</button>
-            </form>
-          {/*</section>*/}
-          <section id='fav-links'></section>
-        </div>
-      </header>
-    )
+      <div className='container'>
+      <form onSubmit={() => this.handleSubmitForm(this.state.inputValue)}>
+        <input
+          id='country-search'
+          value={this.state.inputValue}
+          placeholder='Enter country...'
+          onChange={this.handleInputChange}
+          onFocus={() => this.setState({...this.state, showList: true})}
+          onBlur={() => setTimeout(() => this.setState({...this.state, showList: false}), 200)}
+        />
+        <button id='search-button' type="submit">Search</button>
+        {showList && finalCountries.map((countryName) =>
+            <div key={countryName} onClick={() => this.handleSubmitForm(countryName)}>{countryName}</div>)}
+      </form>
+     <p>{this.state.errorMessage}</p>
+    </div>
+    );
   }
 }
-const mapStateToProps = (state) => ({
+
+Search.propTypes = {
+  history: object.isRequired
+};
+
+const mapStateToProps = state => ({
   events: state.fetchListOfEvent.items
 });
 
-export default connect(mapStateToProps, actions)(Header)
+export default connect(mapStateToProps, actions)(Search);

@@ -39,7 +39,7 @@ class Search extends Component {
         this.setState({errorMessage: '', inputValue: ''})
         history.push({pathname: `/events/country/${contryName.toLowerCase()}`})
     } else {
-        this.setState({errorMessage: 'Sorry, we dont have any events in that city'})
+        this.setState({errorMessage: 'Sorry, we dont have any events in that country'})
     }
   };
 
@@ -56,15 +56,17 @@ class Search extends Component {
     const {finalCountries, showList} = this.state;
 
     return (
-      <div>
-      <form onSubmit={this.handleSubmitForm}>
+      <div className='container'>
+      <form onSubmit={() => this.handleSubmitForm(this.state.inputValue)}>
         <input
+          id='country-search'
           value={this.state.inputValue}
+          placeholder='Enter country...'
           onChange={this.handleInputChange}
           onFocus={() => this.setState({...this.state, showList: true})}
           onBlur={() => setTimeout(() => this.setState({...this.state, showList: false}), 200)}
         />
-        <button type="submit">Search</button>
+        <button id='search-button' type="submit">Search</button>
         {showList && finalCountries.map((countryName) =>
             <div key={countryName} onClick={() => this.handleSubmitForm(countryName)}>{countryName}</div>)}
       </form>

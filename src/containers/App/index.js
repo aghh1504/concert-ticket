@@ -11,10 +11,9 @@ class App extends Component {
   render () {
     return (
       <div id='main-container'>
-        <Header />
-        <Route component={Search} />
+        <Route component={Header}/>
         <Route component={Events} />
-        {/*<Footer />*/}
+        <Footer />
       </div>
     );
   }
