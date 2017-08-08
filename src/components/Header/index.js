@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import {object} from 'prop-types';
 import * as actions from "../../action";
 import {countryCodes, conutryNameToCode} from "../../helper/countrycodemapping";
+import Basket from '../Basket'
 
 class Search extends Component {
   constructor (props) {
@@ -57,9 +58,11 @@ class Search extends Component {
 
     return (
       <div className='container'>
+        <Basket />
       <form onSubmit={() => this.handleSubmitForm(this.state.inputValue)}>
         <div className='input-dropdown'>
           <input
+            autocomplete='off'
             id='country-search'
             value={this.state.inputValue}
             placeholder='Enter country...'
@@ -68,12 +71,11 @@ class Search extends Component {
             onBlur={() => setTimeout(() => this.setState({...this.state, showList: false}), 200)}
           />
           <button id='search-button' type="submit">Search</button>
-          <div className='dropdown'>
-            {
-              showList && finalCountries.map((countryName) =>
+          {showList && <div className='dropdown'>
+            {finalCountries.map((countryName) =>
                 <div key={countryName} className='country-item' onClick={() => this.handleSubmitForm(countryName)}>{countryName}</div>)
             }
-          </div>
+          </div>}
         </div>
       </form>
      <p>{this.state.errorMessage}</p>

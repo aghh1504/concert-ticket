@@ -86,6 +86,7 @@ a {
 
 .c-list__button__buy__ticket {
   background-color: #e1192c;
+  color: #fff;
   border: none;
   width: 71px;
   height: 32px;
@@ -98,6 +99,7 @@ a {
 
 .c-list__button__see__more {
   background-color: #0284d4;
+  color: #fff;
   border: none;
   width: 71px;
   height: 32px;
@@ -107,7 +109,18 @@ a {
   vertical-align: top;
 }
 
-
+.c-list__button__wishlist {
+  background-color: green;
+  border: none;
+  color: #fff;
+  width: 71px;
+  height: 32px;
+  font-weight: bold;
+  border-radius: 15px;
+  box-shadow: 0px 0px 5px darkblue;
+  vertical-align: top;
+  margin-left: 16px;
+}
 
 /*media queries*/
 
@@ -164,7 +177,26 @@ form{
     font-family: Helvetica;
     border: 1px solid #c0c0c0;
     background: #fff;
-    width: 30%;
+
     display: flex;
     justify-content: center;
+}
+
+.input-dropdown {
+ width: 466px;
+margin: auto;
+position: relative;
+}
+
+.dropdown {
+  width: 280px;
+  position: absolute;
+  left: 45px;
+}
+
+.basket {
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  border: 1px solid green;
 }

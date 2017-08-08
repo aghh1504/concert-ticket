@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
-import {Route} from 'react-router-dom';
-import {Link} from 'react-router-dom';
-import {array, bool, func} from 'prop-types';
-import { connect } from "react-redux"
+import React, { Component } from "react";
+import { Route } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { array, bool, func } from "prop-types";
+import { connect } from "react-redux";
+import moment from "moment";
 import * as actions from "../../action";
-import {countryCodes, conutryNameToCode} from '../../helper/countrycodemapping.js';
-import '../../App.css';
+import {countryCodes,conutryNameToCode} from "../../helper/countrycodemapping.js";
+import Event from "./Event";
+import "../../App.css";
 
 const getUniqueEvents = (events = []) => {
   const eventsMap = {};
@@ -13,7 +15,7 @@ const getUniqueEvents = (events = []) => {
   return events.reduce((result, item) => {
     const eventName = item.name;
 
-    if(!eventsMap[eventName]) {
+    if (!eventsMap[eventName]) {
       eventsMap[eventName] = true;
       result.push(item);
     }
@@ -23,8 +25,12 @@ const getUniqueEvents = (events = []) => {
 };
 
 class EventsList extends Component {
+  state = {
+    filteredEvents: [],
+    error: ""
+  };
 
-  getCountryCode () {
+  getCountryCode() {
     return conutryNameToCode[this.props.match.params.countryName];
   }
 
@@ -33,68 +39,80 @@ class EventsList extends Component {
   }
 
   showWeek = () => {
-    this.props.events.map(event => {
-      if(event.dates.start.localDate) {
-        console.log('data',Date())
-      }
-    })
-  }
+    this.showFilteredEvents('week')
+  };
 
-  showMouth = () => {
-    console.log('showMouth')
-
+  showMonth = () => {
+    this.showFilteredEvents('month')
   }
 
   showAll = () => {
-    console.log('showAll')
+    this.showFilteredEvents('all')
+  };
 
-  }
+  showFilteredEvents = (period = 'all') => {
+    if (period === 'all') {
+      this.setState({
+        filteredEvents: this.props.events,
+        error: this.props.events.length > 0 ? '': 'There are no events'
+      });
+    } else {
+      const filteredEvents = this.props.events.filter((event)=>{
+        const eventDate = new Date(event.dates.start.localDate);
+        const month = eventDate.getMonth();
+        const dateNow = new Date(Date());
+        const monthNow = dateNow.getMonth();
+
+        const weekEvent = moment(event.dates.start.localDate).weeks();
+        const weekNow = moment(Date()).weeks();
+
+        if (period ==='month' && month === monthNow) {
+          return event;
+        }
+        if (period === 'week' && weekEvent === weekNow) {
+          return event
+        }
+      });
+      this.setState({
+        filteredEvents: filteredEvents,
+        error: filteredEvents.length > 0 ? '': `There are no ${period} events`
+      });
+    }
+  };
+
+
 
   render() {
-    const {events, inProgress} = this.props;
+    const { events, inProgress } = this.props;
+    const {error, filteredEvents} = this.state;
     const countryCode = this.getCountryCode();
     const countryName = countryCodes[countryCode];
 
-    if (inProgress) {
-        return <div>Loading...</div>
-    }
+    const showEvents = filteredEvents.length > 0 ? filteredEvents : events;
 
-    // const {countryName} = match.params;
+    if (inProgress) {
+      return <div>Loading...</div>;
+    }
     return (
-      <div className='container'>
-        <h1>Events {countryName ? `in ${countryName}` : 'everywhere'}</h1>
-        {!events.length ? 'No events found' :  <div>
+      <div className="container">
+        <h1>
+          Events {countryName ? `in ${countryName}` : "everywhere"}
+        </h1>
         <div>
-            <button onClick={this.showWeek}>This week</button>
-            <button onClick={this.showMouth}>This month</button>
-            <button onClick={this.showAll}>All</button>
-        </div>
-        <ul className="c-list">
-           {events.map(item => {
-               return (
-                   <li className="c-list__item" key={item.id}>
-                           <div className="c-list__block">
-                               <div className='c-list__image__container'>
-                                  <img alt={item.name} className="c-list__image" src={item.images[0].url}/>
-                              </div>
-                            <div className='c-list__description'>
-                              <h4 className="c-list__title">{item.name}</h4>
-                              <p>Date: {item.dates.start.localDate}</p>
-                              <p>Time: {item.dates.start.localTime}</p>
-                              <p>Place: {item._embedded.venues[0].name} {item._embedded.venues[0].address.line1}, {item._embedded.venues[0].city.name}</p>
-                            </div>
-                              <div className='c-list__button'>
-                                <button className='c-list__button__buy__ticket'><a target="_blank" href={item.url}>Buy ticket</a></button>
-                                <Link to={`/events/${item.id}`}>
-                                  <button className='c-list__button__see__more'>See more</button>
-                                </Link>
-                             </div>
-                           </div>
-                   </li>
-               )
-           })}
-        </ul>
-      </div> }
+            <div>
+              <button onClick={this.showWeek}>This week</button>
+              <button onClick={this.showMonth}>This month</button>
+              <button onClick={this.showAll}>All</button>
+            </div>
+            {error && <p>
+              {error}
+            </p>}
+
+            {!error && <ul className="c-list">
+              {showEvents &&
+               showEvents.map(item => <Event item={item} addToWishlist={this.props.addToWishlist}/>)}
+            </ul>}
+          </div>
       </div>
     );
   }
@@ -106,9 +124,10 @@ EventsList.propTypes = {
   fetchListOfEvent: func.isRequired
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   events: getUniqueEvents(state.fetchListOfEvent.items),
-  inProgress: state.fetchListOfEvent.inProgress
+  inProgress: state.fetchListOfEvent.inProgress,
+  error: state.fetchListOfEvent.error
 });
 
 export default connect(mapStateToProps, actions)(EventsList);
