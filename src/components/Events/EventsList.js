@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { Route } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { array, bool, func } from "prop-types";
 import { connect } from "react-redux";
 import moment from "moment";
@@ -57,7 +55,7 @@ class EventsList extends Component {
         error: this.props.events.length > 0 ? '': 'There are no events'
       });
     } else {
-      const filteredEvents = this.props.events.filter((event)=>{
+      const filteredEvents = this.props.events.filter((event) => {
         const eventDate = new Date(event.dates.start.localDate);
         const month = eventDate.getMonth();
         const dateNow = new Date(Date());
@@ -79,8 +77,6 @@ class EventsList extends Component {
       });
     }
   };
-
-
 
   render() {
     const { events, inProgress } = this.props;

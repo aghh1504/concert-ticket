@@ -62,7 +62,7 @@ class Search extends Component {
       <form onSubmit={() => this.handleSubmitForm(this.state.inputValue)}>
         <div className='input-dropdown'>
           <input
-            autocomplete='off'
+            autoComplete='off'
             id='country-search'
             value={this.state.inputValue}
             placeholder='Enter country...'

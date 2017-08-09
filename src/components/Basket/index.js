@@ -7,7 +7,7 @@ class Basket extends Component {
   render() {
     return (
         <div className='basket'>
-          {this.state.amount}
+          items: {this.props.items}
         </div>
     )
   }
