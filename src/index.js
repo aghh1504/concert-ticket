@@ -1,22 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware, combineReducers } from 'redux';
-import { render } from 'react-dom';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { createStore, applyMiddleware } from 'redux';
+import { BrowserRouter, Route } from 'react-router-dom';
+import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
 import App from './containers/App';
 import reducers from './reducers';
 import './index.css';
 
-import EventsList from './components/Events/EventsList';
-import ViewEvent from './components/Events/ViewEvent'
 
-
-const store = createStore(
-  reducers,
+const store = createStore(reducers, composeWithDevTools(
   applyMiddleware(thunk)
-)
+));
 
 ReactDOM.render(
   <Provider store={store}>

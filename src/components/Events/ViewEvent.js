@@ -4,7 +4,7 @@ import {object, array, any} from 'prop-types';
 
 class ViewEvent extends Component {
 
-  render () {
+  render() {
     const {events, match} = this.props;
     const defaultResponse = <p>Loading...</p>
     if (!match.params || !match.params.eventId || !events) {

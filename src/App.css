@@ -181,6 +181,9 @@ form{
     display: flex;
     justify-content: center;
 }
+.input-dropdown .country-item.selected {
+  background: #eee;
+}
 
 .input-dropdown {
  width: 466px;

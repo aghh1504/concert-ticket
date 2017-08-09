@@ -1,9 +1,9 @@
-import React, { Component } from "react";
-import { array, bool, func } from "prop-types";
-import { connect } from "react-redux";
+import React, {Component} from "react";
+import {array, bool, func} from "prop-types";
+import {connect} from "react-redux";
 import moment from "moment";
-import * as actions from "../../action";
-import {countryCodes,conutryNameToCode} from "../../helper/countrycodemapping.js";
+import actions from "../../action";
+import {countryCodes, conutryNameToCode} from "../../helper/countrycodemapping.js";
 import Event from "./Event";
 import "../../App.css";
 
@@ -33,7 +33,9 @@ class EventsList extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchListOfEvent(this.getCountryCode());
+    if (!this.props.readyEvents) {
+      this.props.fetchListOfEvent(this.getCountryCode());
+    }
   }
 
   showWeek = () => {
@@ -52,7 +54,7 @@ class EventsList extends Component {
     if (period === 'all') {
       this.setState({
         filteredEvents: this.props.events,
-        error: this.props.events.length > 0 ? '': 'There are no events'
+        error: this.props.events.length > 0 ? '' : 'There are no events'
       });
     } else {
       const filteredEvents = this.props.events.filter((event) => {
@@ -64,7 +66,7 @@ class EventsList extends Component {
         const weekEvent = moment(event.dates.start.localDate).weeks();
         const weekNow = moment(Date()).weeks();
 
-        if (period ==='month' && month === monthNow) {
+        if (period === 'month' && month === monthNow) {
           return event;
         }
         if (period === 'week' && weekEvent === weekNow) {
@@ -73,13 +75,13 @@ class EventsList extends Component {
       });
       this.setState({
         filteredEvents: filteredEvents,
-        error: filteredEvents.length > 0 ? '': `There are no ${period} events`
+        error: filteredEvents.length > 0 ? '' : `There are no ${period} events`
       });
     }
   };
 
   render() {
-    const { events, inProgress } = this.props;
+    const {events, inProgress, removeFromWishlist, addToWishlist} = this.props;
     const {error, filteredEvents} = this.state;
     const countryCode = this.getCountryCode();
     const countryName = countryCodes[countryCode];
@@ -95,33 +97,41 @@ class EventsList extends Component {
           Events {countryName ? `in ${countryName}` : "everywhere"}
         </h1>
         <div>
-            <div>
-              <button onClick={this.showWeek}>This week</button>
-              <button onClick={this.showMonth}>This month</button>
-              <button onClick={this.showAll}>All</button>
-            </div>
-            {error && <p>
-              {error}
-            </p>}
-
-            {!error && <ul className="c-list">
-              {showEvents &&
-               showEvents.map(item => <Event item={item} addToWishlist={this.props.addToWishlist}/>)}
-            </ul>}
+          <div>
+            <button onClick={this.showWeek}>This week</button>
+            <button onClick={this.showMonth}>This month</button>
+            <button onClick={this.showAll}>All</button>
           </div>
+          {error && <p>
+            {error}
+          </p>}
+
+          {!error && <ul className="c-list">
+            {showEvents &&
+            showEvents.map(item => <Event
+              key={item.id}
+              item={item}
+              isInWishlist={Boolean(this.props.wishListEventsMap[item.id])}
+              addToWishlist={addToWishlist}
+              removeFromWishlist={removeFromWishlist}/>)}
+          </ul>}
+        </div>
       </div>
     );
   }
 }
 
 EventsList.propTypes = {
+  readyEvents: array,
   events: array,
+  wishListEventsMap: array,
   inProgress: bool,
   fetchListOfEvent: func.isRequired
 };
 
-const mapStateToProps = state => ({
-  events: getUniqueEvents(state.fetchListOfEvent.items),
+const mapStateToProps = (state, ownProps) => ({
+  wishListEventsMap: state.addToWishlist.items.reduce((result, item) => (result[item.id] = item, result), {}),
+  events: ownProps.readyEvents || getUniqueEvents(state.fetchListOfEvent.items),
   inProgress: state.fetchListOfEvent.inProgress,
   error: state.fetchListOfEvent.error
 });
